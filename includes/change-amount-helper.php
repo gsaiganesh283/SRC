@@ -62,7 +62,7 @@ if (!function_exists('caEnsureTable')) {
      * Change amount per member: [MemberID => total]. Optional year, member list and date limits
      * ($before = strictly before that date; $from/$to = inclusive range).
      */
-    function caMemberTotals(PDO $pdo, $yearId = null, array $memberIds = null, $before = null, $from = null, $to = null) {
+    function caMemberTotals(PDO $pdo, $yearId = null, ?array $memberIds = null, $before = null, $from = null, $to = null) {
         try {
             caEnsureTable($pdo);
             $where = ['MemberID IS NOT NULL'];
