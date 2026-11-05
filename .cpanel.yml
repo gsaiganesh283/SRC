@@ -1,15 +1,21 @@
 ---
-# cPanel deployment configuration.
+# cPanel Git Version Control deployment.
 #
-# This repository is checked out directly in the site's document root
-# (/home/qbgdvqgo/pds), so after cPanel checks out HEAD the files are already
-# live -- there is nothing to copy. These tasks simply let the "Deploy HEAD
-# Commit" button succeed and print where it deployed.
+# The cPanel "Repository Path" configured for this repository IS the site's
+# document root, so once cPanel checks out HEAD the files are already live --
+# there is nothing to copy. This file only needs to be valid YAML with at least
+# one task that succeeds, so the "Deploy HEAD Commit" button works.
 #
-# NOTE: Deploy also requires a CLEAN working tree ("no uncommitted changes").
-# If Deploy/Pull reports local changes, clear them first (see
-# DEPLOY_FROM_GIT.md, section B -- git-fix.php / reset --hard).
+# NOTE 1: config/config.php is intentionally NOT in the repository (it holds the
+#         server's DB credentials and is git-ignored), so deployment never
+#         overwrites or deletes the server's own config.php.
+#
+# NOTE 2: Deploy also requires a CLEAN working tree on the server
+#         ("No uncommitted changes exist on the checked-out branch").
+#         If Deploy/Pull reports local changes, clear them once in cPanel
+#         Terminal (from the repository path):
+#             git reset --hard HEAD && git clean -fd
+#         then press "Update from Remote" and "Deploy HEAD Commit" again.
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/qbgdvqgo/public_html/src
-    - /bin/echo "Deployed to $DEPLOYPATH"
+    - /bin/echo "SRC: HEAD checked out into the document root -- site is live."
