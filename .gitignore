@@ -46,6 +46,9 @@ assets/uploads/*
 uploads/*
 !uploads/.gitkeep
 
+# Temporary one-off server helper (never commit; runs shell commands)
+git-fix.php
+
 # Build and dist files
 dist/
 build/
