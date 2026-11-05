@@ -1,0 +1,1 @@
+echo ini_get('allow_url_fopen') ? 'ON' : 'OFF - THIS IS THE PROBLEM';

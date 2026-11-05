@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Fields Setup Instructions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4f46e5;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #059669;
+            margin-top: 30px;
+        }
+        .step {
+            background: #f9fafb;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4f46e5;
+            border-radius: 8px;
+        }
+        .code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Custom Fields Setup Instructions</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Important Notice:</strong> The custom fields feature requires additional database tables. Follow the instructions below to enable this feature.
+        </div>
+        
+        <h2>📋 Prerequisites</h2>
+        <ul>
+            <li>Access to phpMyAdmin or MySQL command line</li>
+            <li>Database credentials for your SR Colony system</li>
+            <li>The SQL file: <code>database/CREATE_CUSTOM_FIELDS_TABLE.sql</code></li>
+        </ul>
+        
+        <h2>🚀 Setup Steps</h2>
+        
+        <div class="step">
+            <strong>Step 1: Locate the SQL File</strong>
+            <p>Navigate to your project directory and find:</p>
+            <div class="code">database/CREATE_CUSTOM_FIELDS_TABLE.sql</div>
+        </div>
+        
+        <div class="step">
+            <strong>Step 2: Access Your Database</strong>
+            <p>Open phpMyAdmin or connect via MySQL command line:</p>
+            <div class="code">mysql -u your_username -p your_database_name</div>
+        </div>
+        
+        <div class="step">
+            <strong>Step 3: Run the SQL Script</strong>
+            <p><strong>Option A - Using phpMyAdmin:</strong></p>
+            <ol>
+                <li>Open phpMyAdmin</li>
+                <li>Select your database (srcolony)</li>
+                <li>Click on "SQL" tab</li>
+                <li>Copy the contents of CREATE_CUSTOM_FIELDS_TABLE.sql</li>
+                <li>Paste into the SQL query box</li>
+                <li>Click "Go" to execute</li>
+            </ol>
+            
+            <p><strong>Option B - Using Command Line:</strong></p>
+            <div class="code">mysql -u your_username -p srcolony < database/CREATE_CUSTOM_FIELDS_TABLE.sql</div>
+        </div>
+        
+        <div class="step">
+            <strong>Step 4: Verify Installation</strong>
+            <p>Check that the following tables were created:</p>
+            <ul>
+                <li><code>custom_field_definitions</code> - Stores field definitions</li>
+                <li><code>custom_field_values</code> - Stores field values</li>
+            </ul>
+            <p>Run this query to verify:</p>
+            <div class="code">SHOW TABLES LIKE 'custom_field%';</div>
+        </div>
+        
+        <div class="success">
+            <strong>✅ Success!</strong> Once the tables are created, you can:
+            <ul>
+                <li>Import/Export custom field definitions</li>
+                <li>Import/Export custom field values</li>
+                <li>Extend member and transaction data with custom fields</li>
+                <li>View custom fields statistics on the dashboard</li>
+            </ul>
+        </div>
+        
+        <h2>📊 What Gets Created</h2>
+        
+        <div class="step">
+            <strong>Table 1: custom_field_definitions</strong>
+            <p>Defines the structure of custom fields:</p>
+            <ul>
+                <li><strong>Field Types:</strong> text, number, date, dropdown, checkbox, textarea, email, phone</li>
+                <li><strong>Entity Types:</strong> member, transaction, year, general</li>
+                <li><strong>Features:</strong> Validation rules, required fields, dropdown options</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <strong>Table 2: custom_field_values</strong>
+            <p>Stores actual values for custom fields:</p>
+            <ul>
+                <li>Links to members, transactions, or years</li>
+                <li>Prevents duplicate values</li>
+                <li>Supports all field types</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <strong>Sample Data Included:</strong>
+            <ul>
+                <li><strong>Member Fields:</strong> Occupation, Blood Group, Emergency Contact, Annual Income, Joining Date, Notes</li>
+                <li><strong>Transaction Fields:</strong> Payment Category, Approved By, Attachment URL</li>
+                <li>Pre-configured dropdown options for Blood Group and Payment Category</li>
+            </ul>
+        </div>
+        
+        <h2>🔍 Troubleshooting</h2>
+        
+        <div class="step">
+            <strong>Error: "Table already exists"</strong>
+            <p>The tables are already created. You can use the feature immediately.</p>
+        </div>
+        
+        <div class="step">
+            <strong>Error: "Access denied"</strong>
+            <p>Ensure you have CREATE and ALTER privileges on the database.</p>
+        </div>
+        
+        <div class="step">
+            <strong>Error: "Syntax error"</strong>
+            <p>Make sure you copied the entire SQL file without modifications.</p>
+        </div>
+        
+        <h2>📚 Next Steps</h2>
+        <ol>
+            <li>Download sample templates from the Import/Export page</li>
+            <li>Review the sample data format</li>
+            <li>Create your custom field definitions</li>
+            <li>Import custom field values for your members/transactions</li>
+            <li>Export data for backup or analysis</li>
+        </ol>
+        
+        <div class="success">
+            <strong>💡 Pro Tip:</strong> Start with the sample templates to understand the format, then customize them for your needs!
+        </div>
+        
+        <p style="text-align: center; margin-top: 40px; color: #6b7280;">
+            <a href="data-import-export.php" style="background: #4f46e5; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">← Back to Import/Export</a>
+        </p>
+    </div>
+</body>
+</html>

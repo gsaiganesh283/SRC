@@ -1,0 +1,12 @@
+{
+    "name": "srcolony/views",
+    "description": "SR Colony Management System",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "phpoffice/phpspreadsheet": "^1.29"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

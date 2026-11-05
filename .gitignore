@@ -1,0 +1,52 @@
+# Database and credentials
+# config/config.php is EXCLUDED because it currently holds live DB credentials
+# config/config.local.php holds credentials and must not be committed
+config/config.php
+config/config.local.php
+.env
+.env.local
+database/
+backup/
+backups/
+!backups/README.md
+*.sql
+Expense-Report-*.pdf
+
+# Dependencies
+composer.lock
+node_modules/
+package-lock.json
+yarn.lock
+
+# PHP and IDE files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.phpunit.result.cache
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+cache/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# User uploads (optional - uncomment if needed)
+assets/uploads/*
+!assets/uploads/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Build and dist files
+dist/
+build/
+backup_2026-04-17_17-35-35.sql

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SR Colony - All Pages Directory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+        .page-header p { font-size: 14px; opacity: 0.9; }
+
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-stat {
+            font-size: 13px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .header-stat strong { font-weight: 700; }
+
+        .search-bar {
+            max-width: 500px;
+            margin: 15px auto 0;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            outline: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-bar input::placeholder { color: rgba(255,255,255,0.7); }
+        .search-bar i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); }
+
+        .container { max-width: 1500px; margin: 25px auto; padding: 0 20px; }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .back-home:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.3); }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .filter-btn:hover, .filter-btn.active { border-color: #667eea; color: #667eea; background: #f0f0ff; }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .section-card:hover { box-shadow: 0 6px 25px rgba(0,0,0,0.1); }
+
+        .section-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-header:hover { background: #fafbfc; }
+
+        .section-header i.section-icon {
+            font-size: 18px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 { font-size: 16px; font-weight: 700; flex: 1; }
+        .section-header .badge { background: #f1f5f9; color: #64748b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .section-header .toggle-icon { color: #94a3b8; font-size: 12px; transition: transform 0.3s; }
+        .section-card.collapsed .toggle-icon { transform: rotate(-90deg); }
+        .section-card.collapsed .link-list { display: none; }
+
+        /* Color themes */
+        .section-auth .section-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .section-auth h2 { color: #667eea; }
+        .section-member .section-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .section-member h2 { color: #059669; }
+        .section-admin .section-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .section-admin h2 { color: #d97706; }
+        .section-superadmin .section-icon { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .section-superadmin h2 { color: #dc2626; }
+        .section-accounting .section-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .section-accounting h2 { color: #7c3aed; }
+        .section-events .section-icon { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .section-events h2 { color: #db2777; }
+        .section-api .section-icon { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .section-api h2 { color: #0891b2; }
+        .section-includes .section-icon { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .section-includes h2 { color: #0d9488; }
+        .section-config .section-icon { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .section-config h2 { color: #4f46e5; }
+        .section-test .section-icon { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .section-test h2 { color: #ea580c; }
+        .section-debug .section-icon { background: linear-gradient(135deg, #eab308, #ca8a04); }
+        .section-debug h2 { color: #ca8a04; }
+        .section-tools .section-icon { background: linear-gradient(135deg, #64748b, #475569); }
+        .section-tools h2 { color: #475569; }
+        .section-docs .section-icon { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+        .section-docs h2 { color: #0284c7; }
+
+        .link-list { padding: 5px 0; }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #334155;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .link-item:hover { background: #f8fafc; border-left-color: #667eea; color: #667eea; }
+        .link-item i { width: 18px; margin-right: 10px; font-size: 13px; color: #94a3b8; transition: color 0.2s; }
+        .link-item:hover i { color: #667eea; }
+        .link-item .link-name { flex: 1; font-size: 13px; font-weight: 500; }
+        .link-item .link-path { font-size: 10px; color: #b0b8c4; font-family: 'Courier New', monospace; }
+        .link-item:hover .link-path { color: #667eea; }
+
+        .link-divider {
+            padding: 8px 20px 3px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+        }
+
+        .hidden { display: none !important; }
+
+        .no-results { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .no-results i { font-size: 48px; margin-bottom: 15px; display: block; }
+
+        footer { text-align: center; padding: 25px 20px; color: #94a3b8; font-size: 12px; }
+
+        @media (max-width: 768px) {
+            .sections-grid { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1><i class="fas fa-sitemap"></i> SR Colony - Complete Pages Directory</h1>
+    <p>Direct access to every PHP page — debug, test, utilities, portals & more</p>
+    <div class="header-stats">
+        <span class="header-stat"><strong id="totalCount">0</strong> Total Pages</span>
+        <span class="header-stat"><strong id="visibleCount">0</strong> Showing</span>
+        <span class="header-stat"><strong>13</strong> Sections</span>
+    </div>
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search all pages..." oninput="filterLinks()">
+    </div>
+</div>
+
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" class="back-home"><i class="fas fa-home"></i> Home</a>
+        <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
+        <button class="filter-btn" onclick="filterCategory('test', this)">Tests</button>
+        <button class="filter-btn" onclick="filterCategory('debug', this)">Debug</button>
+        <button class="filter-btn" onclick="filterCategory('admin', this)">Admin</button>
+        <button class="filter-btn" onclick="filterCategory('superadmin', this)">Super Admin</button>
+        <button class="filter-btn" onclick="filterCategory('member', this)">Member</button>
+        <button class="filter-btn" onclick="filterCategory('api', this)">API</button>
+        <button class="filter-btn" onclick="filterCategory('utility', this)">Utilities</button>
+        <button class="filter-btn" onclick="expandAll()"><i class="fas fa-expand-alt"></i> Expand All</button>
+        <button class="filter-btn" onclick="collapseAll()"><i class="fas fa-compress-alt"></i> Collapse All</button>
+    </div>
+
+    <div id="noResults" class="no-results hidden">
+        <i class="fas fa-search"></i>
+        <p>No pages found matching your search.</p>
+    </div>
+
+    <div class="sections-grid" id="sectionsGrid">
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- AUTHENTICATION -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-auth" data-section data-cat="auth">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-key section-icon"></i>
+                <h2>Authentication</h2>
+                <span class="badge">5</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="auth/member-login.php" target="_blank" class="link-item" data-link><i class="fas fa-user"></i><span class="link-name">Member Login</span><span class="link-path">auth/member-login.php</span></a>
+                <a href="auth/admin-login.php" target="_blank" class="link-item" data-link><i class="fas fa-user-shield"></i><span class="link-name">Admin Login</span><span class="link-path">auth/admin-login.php</span></a>
+                <a href="superadmin/login.php" target="_blank" class="link-item" data-link><i class="fas fa-crown"></i><span class="link-name">Super Admin Login</span><span class="link-path">superadmin/login.php</span></a>
+                <a href="auth/forgot-password.php" target="_blank" class="link-item" data-link><i class="fas fa-unlock-alt"></i><span class="link-name">Forgot Password</span><span class="link-path">auth/forgot-password.php</span></a>
+                <a href="auth/change-password.php" target="_blank" class="link-item" data-link><i class="fas fa-key"></i><span class="link-name">Change Password</span><span class="link-path">auth/change-password.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- MEMBER PORTAL -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-member" data-section data-cat="member">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-users section-icon"></i>
+                <h2>Member Portal</h2>
+                <span class="badge">16</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="member/dashboard.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Dashboard</span><span class="link-path">member/dashboard.php</span></a>
+                <a href="member/dashboard-new.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Dashboard (New)</span><span class="link-path">member/dashboard-new.php</span></a>
+                <a href="member/member.php" target="_blank" class="link-item" data-link><i class="fas fa-id-badge"></i><span class="link-name">Member Page</span><span class="link-path">member/member.php</span></a>
+                <a href="member/my-payments.php" target="_blank" class="link-item" data-link><i class="fas fa-money-bill-wave"></i><span class="link-name">My Payments</span><span class="link-path">member/my-payments.php</span></a>
+                <a href="member/reports.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-line"></i><span class="link-name">Reports</span><span class="link-path">member/reports.php</span></a>
+                <a href="member/documents.php" target="_blank" class="link-item" data-link><i class="fas fa-file-alt"></i><span class="link-name">Documents</span><span class="link-path">member/documents.php</span></a>
+                <a href="member/notifications.php" target="_blank" class="link-item" data-link><i class="fas fa-bell"></i><span class="link-name">Notifications</span><span class="link-path">member/notifications.php</span></a>
+                <a href="member/profile.php" target="_blank" class="link-item" data-link><i class="fas fa-user-circle"></i><span class="link-name">Profile</span><span class="link-path">member/profile.php</span></a>
+                <a href="member/view-profile.php" target="_blank" class="link-item" data-link><i class="fas fa-id-card"></i><span class="link-name">View Profile</span><span class="link-path">member/view-profile.php</span></a>
+                <a href="member/update-profile.php" target="_blank" class="link-item" data-link><i class="fas fa-user-edit"></i><span class="link-name">Update Profile</span><span class="link-path">member/update-profile.php</span></a>
+                <a href="member/settings.php" target="_blank" class="link-item" data-link><i class="fas fa-cog"></i><span class="link-name">Settings</span><span class="link-path">member/settings.php</span></a>
+                <a href="member/export-report-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Report PDF</span><span class="link-path">member/export-report-pdf.php</span></a>
+                <a href="member/export-statement.php" target="_blank" class="link-item" data-link><i class="fas fa-file-export"></i><span class="link-name">Export Statement</span><span class="link-path">member/export-statement.php</span></a>
+                <a href="member/fetch-custom-chart-data.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-pie"></i><span class="link-name">Fetch Custom Chart Data</span><span class="link-path">member/fetch-custom-chart-data.php</span></a>
+                <a href="member/save-template-selection.php" target="_blank" class="link-item" data-link><i class="fas fa-save"></i><span class="link-name">Save Template Selection</span><span class="link-path">member/save-template-selection.php</span></a>
+                <a href="member/test-template-debug.php" target="_blank" class="link-item" data-link><i class="fas fa-bug"></i><span class="link-name">Test Template Debug</span><span class="link-path">member/test-template-debug.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ADMIN PORTAL -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-admin" data-section data-cat="admin">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-user-shield section-icon"></i>
+                <h2>Admin Portal</h2>
+                <span class="badge">18</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="admin/dashboard.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Dashboard</span><span class="link-path">admin/dashboard.php</span></a>
+                <a href="admin/dashboard-new.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Dashboard (New)</span><span class="link-path">admin/dashboard-new.php</span></a>
+                <a href="admin/dashboard-redirect.php" target="_blank" class="link-item" data-link><i class="fas fa-directions"></i><span class="link-name">Dashboard Redirect</span><span class="link-path">admin/dashboard-redirect.php</span></a>
+                <div class="link-divider">Members</div>
+                <a href="admin/manage-members.php" target="_blank" class="link-item" data-link><i class="fas fa-users"></i><span class="link-name">Manage Members</span><span class="link-path">admin/manage-members.php</span></a>
+                <a href="admin/add-member.php" target="_blank" class="link-item" data-link><i class="fas fa-user-plus"></i><span class="link-name">Add Member</span><span class="link-path">admin/add-member.php</span></a>
+                <a href="admin/view-member.php" target="_blank" class="link-item" data-link><i class="fas fa-eye"></i><span class="link-name">View Member</span><span class="link-path">admin/view-member.php</span></a>
+                <a href="admin/edit-member.php" target="_blank" class="link-item" data-link><i class="fas fa-user-edit"></i><span class="link-name">Edit Member</span><span class="link-path">admin/edit-member.php</span></a>
+                <a href="admin/delete-member.php" target="_blank" class="link-item" data-link><i class="fas fa-user-minus"></i><span class="link-name">Delete Member</span><span class="link-path">admin/delete-member.php</span></a>
+                <div class="link-divider">Transactions</div>
+                <a href="admin/manage-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-exchange-alt"></i><span class="link-name">Manage Transactions</span><span class="link-path">admin/manage-transactions.php</span></a>
+                <a href="admin/add-transaction.php" target="_blank" class="link-item" data-link><i class="fas fa-plus-circle"></i><span class="link-name">Add Transaction</span><span class="link-path">admin/add-transaction.php</span></a>
+                <a href="admin/edit-transaction.php" target="_blank" class="link-item" data-link><i class="fas fa-edit"></i><span class="link-name">Edit Transaction</span><span class="link-path">admin/edit-transaction.php</span></a>
+                <a href="admin/verify-transaction.php" target="_blank" class="link-item" data-link><i class="fas fa-check-circle"></i><span class="link-name">Verify Transaction</span><span class="link-path">admin/verify-transaction.php</span></a>
+                <div class="link-divider">Other</div>
+                <a href="admin/manage-years.php" target="_blank" class="link-item" data-link><i class="fas fa-calendar-alt"></i><span class="link-name">Manage Academic Years</span><span class="link-path">admin/manage-years.php</span></a>
+                <a href="admin/reports.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-line"></i><span class="link-name">Reports</span><span class="link-path">admin/reports.php</span></a>
+                <a href="admin/reports-old.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-line"></i><span class="link-name">Reports (Old)</span><span class="link-path">admin/reports-old.php</span></a>
+                <a href="admin/export-report-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Report PDF</span><span class="link-path">admin/export-report-pdf.php</span></a>
+                <a href="admin/notifications.php" target="_blank" class="link-item" data-link><i class="fas fa-bell"></i><span class="link-name">Notifications</span><span class="link-path">admin/notifications.php</span></a>
+                <a href="admin/settings.php" target="_blank" class="link-item" data-link><i class="fas fa-cog"></i><span class="link-name">Settings</span><span class="link-path">admin/settings.php</span></a>
+                <a href="admin/profile.php" target="_blank" class="link-item" data-link><i class="fas fa-user-circle"></i><span class="link-name">Profile</span><span class="link-path">admin/profile.php</span></a>
+                <a href="admin/view-profile.php" target="_blank" class="link-item" data-link><i class="fas fa-id-card"></i><span class="link-name">View Profile</span><span class="link-path">admin/view-profile.php</span></a>
+                <a href="admin/debug.php" target="_blank" class="link-item" data-link><i class="fas fa-bug"></i><span class="link-name">Debug</span><span class="link-path">admin/debug.php</span></a>
+                <a href="admin/logout.php" target="_blank" class="link-item" data-link><i class="fas fa-sign-out-alt"></i><span class="link-name">Logout</span><span class="link-path">admin/logout.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SUPER ADMIN PORTAL -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-superadmin" data-section data-cat="superadmin">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-crown section-icon"></i>
+                <h2>Super Admin Portal</h2>
+                <span class="badge">38</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="superadmin/dashboard.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Dashboard</span><span class="link-path">superadmin/dashboard.php</span></a>
+                <div class="link-divider">User Management</div>
+                <a href="superadmin/manage-admins.php" target="_blank" class="link-item" data-link><i class="fas fa-users-cog"></i><span class="link-name">Manage Admins</span><span class="link-path">superadmin/manage-admins.php</span></a>
+                <a href="superadmin/manage-members.php" target="_blank" class="link-item" data-link><i class="fas fa-users"></i><span class="link-name">Manage Members</span><span class="link-path">superadmin/manage-members.php</span></a>
+                <a href="superadmin/permissions-management.php" target="_blank" class="link-item" data-link><i class="fas fa-lock"></i><span class="link-name">Permissions Management</span><span class="link-path">superadmin/permissions-management.php</span></a>
+                <a href="superadmin/direct-admin-login.php" target="_blank" class="link-item" data-link><i class="fas fa-sign-in-alt"></i><span class="link-name">Direct Admin Login</span><span class="link-path">superadmin/direct-admin-login.php</span></a>
+                <a href="superadmin/direct-member-login.php" target="_blank" class="link-item" data-link><i class="fas fa-sign-in-alt"></i><span class="link-name">Direct Member Login</span><span class="link-path">superadmin/direct-member-login.php</span></a>
+                <a href="superadmin/admin-auto-login.php" target="_blank" class="link-item" data-link><i class="fas fa-robot"></i><span class="link-name">Admin Auto Login</span><span class="link-path">superadmin/admin-auto-login.php</span></a>
+                <a href="superadmin/member-auto-login.php" target="_blank" class="link-item" data-link><i class="fas fa-robot"></i><span class="link-name">Member Auto Login</span><span class="link-path">superadmin/member-auto-login.php</span></a>
+                <div class="link-divider">Transactions & Years</div>
+                <a href="superadmin/manage-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-exchange-alt"></i><span class="link-name">Manage Transactions</span><span class="link-path">superadmin/manage-transactions.php</span></a>
+                <a href="superadmin/manage-academic-years.php" target="_blank" class="link-item" data-link><i class="fas fa-calendar-alt"></i><span class="link-name">Manage Academic Years</span><span class="link-path">superadmin/manage-academic-years.php</span></a>
+                <a href="superadmin/manage-years.php" target="_blank" class="link-item" data-link><i class="fas fa-calendar"></i><span class="link-name">Manage Years</span><span class="link-path">superadmin/manage-years.php</span></a>
+                <a href="superadmin/net-balance-manager.php" target="_blank" class="link-item" data-link><i class="fas fa-balance-scale"></i><span class="link-name">Net Balance Manager</span><span class="link-path">superadmin/net-balance-manager.php</span></a>
+                <div class="link-divider">Reports & Exports</div>
+                <a href="superadmin/reports.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-line"></i><span class="link-name">Reports</span><span class="link-path">superadmin/reports.php</span></a>
+                <a href="superadmin/export-report-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Report PDF</span><span class="link-path">superadmin/export-report-pdf.php</span></a>
+                <a href="superadmin/export-report.php" target="_blank" class="link-item" data-link><i class="fas fa-file-export"></i><span class="link-name">Export Report</span><span class="link-path">superadmin/export-report.php</span></a>
+                <a href="superadmin/export-net-balance-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Net Balance PDF</span><span class="link-path">superadmin/export-net-balance-pdf.php</span></a>
+                <a href="superadmin/export-transactions-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Transactions PDF</span><span class="link-path">superadmin/export-transactions-pdf.php</span></a>
+                <a href="superadmin/export-audit-logs-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Audit Logs PDF</span><span class="link-path">superadmin/export-audit-logs-pdf.php</span></a>
+                <a href="superadmin/export-data.php" target="_blank" class="link-item" data-link><i class="fas fa-download"></i><span class="link-name">Export Data</span><span class="link-path">superadmin/export-data.php</span></a>
+                <a href="superadmin/audit-logs.php" target="_blank" class="link-item" data-link><i class="fas fa-clipboard-list"></i><span class="link-name">Audit Logs</span><span class="link-path">superadmin/audit-logs.php</span></a>
+                <a href="superadmin/fetch-custom-chart-data.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-pie"></i><span class="link-name">Fetch Custom Chart Data</span><span class="link-path">superadmin/fetch-custom-chart-data.php</span></a>
+                <div class="link-divider">Database & Backup</div>
+                <a href="superadmin/database-backup.php" target="_blank" class="link-item" data-link><i class="fas fa-database"></i><span class="link-name">Database Backup</span><span class="link-path">superadmin/database-backup.php</span></a>
+                <a href="superadmin/data-import-export.php" target="_blank" class="link-item" data-link><i class="fas fa-file-import"></i><span class="link-name">Data Import / Export</span><span class="link-path">superadmin/data-import-export.php</span></a>
+                <a href="superadmin/dbadmin/dbadmin.php" target="_blank" class="link-item" data-link><i class="fas fa-server"></i><span class="link-name">DB Admin</span><span class="link-path">superadmin/dbadmin/dbadmin.php</span></a>
+                <a href="superadmin/google-drive-settings.php" target="_blank" class="link-item" data-link><i class="fab fa-google-drive"></i><span class="link-name">Google Drive Settings</span><span class="link-path">superadmin/google-drive-settings.php</span></a>
+                <div class="link-divider">Downloads & Samples</div>
+                <a href="superadmin/download-sample.php" target="_blank" class="link-item" data-link><i class="fas fa-download"></i><span class="link-name">Download Sample</span><span class="link-path">superadmin/download-sample.php</span></a>
+                <a href="superadmin/download-sample-excel.php" target="_blank" class="link-item" data-link><i class="fas fa-file-excel"></i><span class="link-name">Download Sample Excel</span><span class="link-path">superadmin/download-sample-excel.php</span></a>
+                <a href="superadmin/download-sample-excel-dropdown.php" target="_blank" class="link-item" data-link><i class="fas fa-file-excel"></i><span class="link-name">Download Sample Excel (Dropdown)</span><span class="link-path">superadmin/download-sample-excel-dropdown.php</span></a>
+                <a href="superadmin/download-sample-xlsx.php" target="_blank" class="link-item" data-link><i class="fas fa-file-excel"></i><span class="link-name">Download Sample XLSX</span><span class="link-path">superadmin/download-sample-xlsx.php</span></a>
+                <a href="superadmin/simple-excel-writer.php" target="_blank" class="link-item" data-link><i class="fas fa-file-excel"></i><span class="link-name">Simple Excel Writer</span><span class="link-path">superadmin/simple-excel-writer.php</span></a>
+                <div class="link-divider">Settings & Security</div>
+                <a href="superadmin/settings.php" target="_blank" class="link-item" data-link><i class="fas fa-cog"></i><span class="link-name">Settings</span><span class="link-path">superadmin/settings.php</span></a>
+                <a href="superadmin/link-behavior-settings.php" target="_blank" class="link-item" data-link><i class="fas fa-external-link-alt"></i><span class="link-name">Link Behavior Settings</span><span class="link-path">superadmin/link-behavior-settings.php</span></a>
+                <a href="superadmin/manage-templates.php" target="_blank" class="link-item" data-link><i class="fas fa-palette"></i><span class="link-name">Manage Templates</span><span class="link-path">superadmin/manage-templates.php</span></a>
+                <a href="superadmin/preview-template.php" target="_blank" class="link-item" data-link><i class="fas fa-eye"></i><span class="link-name">Preview Template</span><span class="link-path">superadmin/preview-template.php</span></a>
+                <a href="superadmin/save-template-selection.php" target="_blank" class="link-item" data-link><i class="fas fa-save"></i><span class="link-name">Save Template Selection</span><span class="link-path">superadmin/save-template-selection.php</span></a>
+                <a href="superadmin/two-factor-auth.php" target="_blank" class="link-item" data-link><i class="fas fa-shield-alt"></i><span class="link-name">Two-Factor Authentication</span><span class="link-path">superadmin/two-factor-auth.php</span></a>
+                <a href="superadmin/face-auth.php" target="_blank" class="link-item" data-link><i class="fas fa-camera"></i><span class="link-name">Face Authentication</span><span class="link-path">superadmin/face-auth.php</span></a>
+                <a href="superadmin/face-login-api.php" target="_blank" class="link-item" data-link><i class="fas fa-camera-retro"></i><span class="link-name">Face Login API</span><span class="link-path">superadmin/face-login-api.php</span></a>
+                <a href="superadmin/online-excel-editor.php" target="_blank" class="link-item" data-link><i class="fas fa-table"></i><span class="link-name">Online Excel Editor</span><span class="link-path">superadmin/online-excel-editor.php</span></a>
+                <a href="superadmin/logout.php" target="_blank" class="link-item" data-link><i class="fas fa-sign-out-alt"></i><span class="link-name">Logout</span><span class="link-path">superadmin/logout.php</span></a>
+                <div class="link-divider">Debug & Fix</div>
+                <a href="superadmin/diagnose-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-stethoscope"></i><span class="link-name">Diagnose Transactions</span><span class="link-path">superadmin/diagnose-transactions.php</span></a>
+                <a href="superadmin/check-backup-content.php" target="_blank" class="link-item" data-link><i class="fas fa-search"></i><span class="link-name">Check Backup Content</span><span class="link-path">superadmin/check-backup-content.php</span></a>
+                <a href="superadmin/check-reports-data.php" target="_blank" class="link-item" data-link><i class="fas fa-search"></i><span class="link-name">Check Reports Data</span><span class="link-path">superadmin/check-reports-data.php</span></a>
+                <a href="superadmin/quick-date-check.php" target="_blank" class="link-item" data-link><i class="fas fa-calendar-check"></i><span class="link-name">Quick Date Check</span><span class="link-path">superadmin/quick-date-check.php</span></a>
+                <a href="superadmin/fix-backup-table.php" target="_blank" class="link-item" data-link><i class="fas fa-wrench"></i><span class="link-name">Fix Backup Table</span><span class="link-path">superadmin/fix-backup-table.php</span></a>
+                <a href="superadmin/fix-settings-table.php" target="_blank" class="link-item" data-link><i class="fas fa-wrench"></i><span class="link-name">Fix Settings Table</span><span class="link-path">superadmin/fix-settings-table.php</span></a>
+                <a href="superadmin/fix-transaction-years.php" target="_blank" class="link-item" data-link><i class="fas fa-wrench"></i><span class="link-name">Fix Transaction Years</span><span class="link-path">superadmin/fix-transaction-years.php</span></a>
+                <a href="superadmin/test-reports-query.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Reports Query</span><span class="link-path">superadmin/test-reports-query.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ACCOUNTING MODULE -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-accounting" data-section data-cat="superadmin">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-calculator section-icon"></i>
+                <h2>Accounting Module</h2>
+                <span class="badge">13</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="superadmin/accounting/dashboard.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Accounting Dashboard</span><span class="link-path">superadmin/accounting/dashboard.php</span></a>
+                <a href="superadmin/accounting/manage-expenses.php" target="_blank" class="link-item" data-link><i class="fas fa-receipt"></i><span class="link-name">Manage Expenses</span><span class="link-path">superadmin/accounting/manage-expenses.php</span></a>
+                <a href="superadmin/accounting/add-expense.php" target="_blank" class="link-item" data-link><i class="fas fa-plus-circle"></i><span class="link-name">Add Expense</span><span class="link-path">superadmin/accounting/add-expense.php</span></a>
+                <a href="superadmin/accounting/manage-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-exchange-alt"></i><span class="link-name">Accounting Transactions</span><span class="link-path">superadmin/accounting/manage-transactions.php</span></a>
+                <a href="superadmin/accounting/budget-tracking.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-pie"></i><span class="link-name">Budget Tracking</span><span class="link-path">superadmin/accounting/budget-tracking.php</span></a>
+                <a href="superadmin/accounting/expense-reports.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-bar"></i><span class="link-name">Expense Reports</span><span class="link-path">superadmin/accounting/expense-reports.php</span></a>
+                <a href="superadmin/accounting/print-expense-report.php" target="_blank" class="link-item" data-link><i class="fas fa-print"></i><span class="link-name">Print Expense Report</span><span class="link-path">superadmin/accounting/print-expense-report.php</span></a>
+                <a href="superadmin/accounting/import-expenses.php" target="_blank" class="link-item" data-link><i class="fas fa-file-import"></i><span class="link-name">Import Expenses</span><span class="link-path">superadmin/accounting/import-expenses.php</span></a>
+                <a href="superadmin/accounting/export-expenses.php" target="_blank" class="link-item" data-link><i class="fas fa-file-export"></i><span class="link-name">Export Expenses</span><span class="link-path">superadmin/accounting/export-expenses.php</span></a>
+                <a href="superadmin/accounting/export-expenses-pdf.php" target="_blank" class="link-item" data-link><i class="fas fa-file-pdf"></i><span class="link-name">Export Expenses PDF</span><span class="link-path">superadmin/accounting/export-expenses-pdf.php</span></a>
+                <a href="superadmin/accounting/setup-expenses.php" target="_blank" class="link-item" data-link><i class="fas fa-cogs"></i><span class="link-name">Setup Expenses</span><span class="link-path">superadmin/accounting/setup-expenses.php</span></a>
+                <a href="superadmin/accounting/setup-events.php" target="_blank" class="link-item" data-link><i class="fas fa-cogs"></i><span class="link-name">Setup Events</span><span class="link-path">superadmin/accounting/setup-events.php</span></a>
+                <a href="superadmin/accounting/session.php" target="_blank" class="link-item" data-link><i class="fas fa-cookie"></i><span class="link-name">Accounting Session</span><span class="link-path">superadmin/accounting/session.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- EVENTS MODULE -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-events" data-section data-cat="superadmin">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-calendar-check section-icon"></i>
+                <h2>Events Module</h2>
+                <span class="badge">9</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="superadmin/accounting/events/dashboard.php" target="_blank" class="link-item" data-link><i class="fas fa-tachometer-alt"></i><span class="link-name">Events Dashboard</span><span class="link-path">superadmin/accounting/events/dashboard.php</span></a>
+                <a href="superadmin/accounting/events/manage-events.php" target="_blank" class="link-item" data-link><i class="fas fa-list"></i><span class="link-name">Manage Events</span><span class="link-path">superadmin/accounting/events/manage-events.php</span></a>
+                <a href="superadmin/accounting/events/add-event.php" target="_blank" class="link-item" data-link><i class="fas fa-plus-circle"></i><span class="link-name">Add Event</span><span class="link-path">superadmin/accounting/events/add-event.php</span></a>
+                <a href="superadmin/accounting/events/edit-event.php" target="_blank" class="link-item" data-link><i class="fas fa-edit"></i><span class="link-name">Edit Event</span><span class="link-path">superadmin/accounting/events/edit-event.php</span></a>
+                <a href="superadmin/accounting/events/view-event.php" target="_blank" class="link-item" data-link><i class="fas fa-eye"></i><span class="link-name">View Event</span><span class="link-path">superadmin/accounting/events/view-event.php</span></a>
+                <a href="superadmin/accounting/events/event-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-exchange-alt"></i><span class="link-name">Event Transactions</span><span class="link-path">superadmin/accounting/events/event-transactions.php</span></a>
+                <a href="superadmin/accounting/events/add-transaction.php" target="_blank" class="link-item" data-link><i class="fas fa-plus"></i><span class="link-name">Add Event Transaction</span><span class="link-path">superadmin/accounting/events/add-transaction.php</span></a>
+                <a href="superadmin/accounting/events/import-event-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-file-import"></i><span class="link-name">Import Event Transactions</span><span class="link-path">superadmin/accounting/events/import-event-transactions.php</span></a>
+                <a href="superadmin/accounting/events/event-reports.php" target="_blank" class="link-item" data-link><i class="fas fa-chart-bar"></i><span class="link-name">Event Reports</span><span class="link-path">superadmin/accounting/events/event-reports.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- API ENDPOINTS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-api" data-section data-cat="api">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-plug section-icon"></i>
+                <h2>API Endpoints</h2>
+                <span class="badge">7</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="api/get-notification-count.php" target="_blank" class="link-item" data-link><i class="fas fa-bell"></i><span class="link-name">Get Notification Count</span><span class="link-path">api/get-notification-count.php</span></a>
+                <a href="api/mark-notification-read.php" target="_blank" class="link-item" data-link><i class="fas fa-check"></i><span class="link-name">Mark Notification Read</span><span class="link-path">api/mark-notification-read.php</span></a>
+                <a href="api/mark-all-notifications-read.php" target="_blank" class="link-item" data-link><i class="fas fa-check-double"></i><span class="link-name">Mark All Notifications Read</span><span class="link-path">api/mark-all-notifications-read.php</span></a>
+                <a href="api/update-profile-api.php" target="_blank" class="link-item" data-link><i class="fas fa-user-edit"></i><span class="link-name">Update Profile API</span><span class="link-path">api/update-profile-api.php</span></a>
+                <a href="api/upload-logo.php" target="_blank" class="link-item" data-link><i class="fas fa-image"></i><span class="link-name">Upload Logo</span><span class="link-path">api/upload-logo.php</span></a>
+                <a href="superadmin/api/gdrive-actions.php" target="_blank" class="link-item" data-link><i class="fab fa-google-drive"></i><span class="link-name">Google Drive Actions API</span><span class="link-path">superadmin/api/gdrive-actions.php</span></a>
+                <a href="superadmin/api/proof-upload.php" target="_blank" class="link-item" data-link><i class="fas fa-upload"></i><span class="link-name">Proof Upload API</span><span class="link-path">superadmin/api/proof-upload.php</span></a>
+                <a href="superadmin/api-member-lookup.php" target="_blank" class="link-item" data-link><i class="fas fa-search"></i><span class="link-name">Member Lookup API</span><span class="link-path">superadmin/api-member-lookup.php</span></a>
+                <a href="superadmin/api-net-balance.php" target="_blank" class="link-item" data-link><i class="fas fa-balance-scale"></i><span class="link-name">Net Balance API</span><span class="link-path">superadmin/api-net-balance.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TEST PAGES -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-test" data-section data-cat="test">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-vial section-icon"></i>
+                <h2>Test Pages</h2>
+                <span class="badge">14</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="test-advanced-balance-system.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Advanced Balance System</span><span class="link-path">test-advanced-balance-system.php</span></a>
+                <a href="test-auto-recalculate.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Auto Recalculate</span><span class="link-path">test-auto-recalculate.php</span></a>
+                <a href="test-auto-recalculate-debug.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Auto Recalculate Debug</span><span class="link-path">test-auto-recalculate-debug.php</span></a>
+                <a href="test-auto-recalculate-form.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Auto Recalculate Form</span><span class="link-path">test-auto-recalculate-form.php</span></a>
+                <a href="test-cookie-flow.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Cookie Flow</span><span class="link-path">test-cookie-flow.php</span></a>
+                <a href="test-dashboard-error.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Dashboard Error</span><span class="link-path">test-dashboard-error.php</span></a>
+                <a href="test-db-status.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test DB Status</span><span class="link-path">test-db-status.php</span></a>
+                <a href="test-manual-update-fix.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Manual Update Fix</span><span class="link-path">test-manual-update-fix.php</span></a>
+                <a href="test-net-balance-errors.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Net Balance Errors</span><span class="link-path">test-net-balance-errors.php</span></a>
+                <a href="test-net-balance-transaction-updates.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Net Balance Transaction Updates</span><span class="link-path">test-net-balance-transaction-updates.php</span></a>
+                <a href="test-net-balance-verification.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Net Balance Verification</span><span class="link-path">test-net-balance-verification.php</span></a>
+                <a href="test-page-load.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Page Load</span><span class="link-path">test-page-load.php</span></a>
+                <a href="test-transaction-month-fix.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Transaction Month Fix</span><span class="link-path">test-transaction-month-fix.php</span></a>
+                <a href="test-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Transactions</span><span class="link-path">test-transactions.php</span></a>
+                <a href="test-years.php" target="_blank" class="link-item" data-link><i class="fas fa-vial"></i><span class="link-name">Test Years</span><span class="link-path">test-years.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DEBUG PAGES -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-debug" data-section data-cat="debug">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-bug section-icon"></i>
+                <h2>Debug & Diagnostic Pages</h2>
+                <span class="badge">6</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="debug-session.php" target="_blank" class="link-item" data-link><i class="fas fa-bug"></i><span class="link-name">Debug Session</span><span class="link-path">debug-session.php</span></a>
+                <a href="debug-test.php" target="_blank" class="link-item" data-link><i class="fas fa-bug"></i><span class="link-name">Debug Test</span><span class="link-path">debug-test.php</span></a>
+                <a href="diagnostic.php" target="_blank" class="link-item" data-link><i class="fas fa-stethoscope"></i><span class="link-name">Diagnostic</span><span class="link-path">diagnostic.php</span></a>
+                <a href="check-php.php" target="_blank" class="link-item" data-link><i class="fas fa-info-circle"></i><span class="link-name">Check PHP</span><span class="link-path">check-php.php</span></a>
+                <a href="check-site-status.php" target="_blank" class="link-item" data-link><i class="fas fa-heartbeat"></i><span class="link-name">Check Site Status</span><span class="link-path">check-site-status.php</span></a>
+                <a href="check-members-table.php" target="_blank" class="link-item" data-link><i class="fas fa-table"></i><span class="link-name">Check Members Table</span><span class="link-path">check-members-table.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- UTILITY / FIX / SETUP SCRIPTS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-tools" data-section data-cat="utility">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-tools section-icon"></i>
+                <h2>Utility & Fix Scripts</h2>
+                <span class="badge">12</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <div class="link-divider">Setup & Init</div>
+                <a href="index.php" target="_blank" class="link-item" data-link><i class="fas fa-home"></i><span class="link-name">Index (PHP)</span><span class="link-path">index.php</span></a>
+                <a href="setup-logo-settings.php" target="_blank" class="link-item" data-link><i class="fas fa-image"></i><span class="link-name">Setup Logo Settings</span><span class="link-path">setup-logo-settings.php</span></a>
+                <a href="initialize-net-balance-table.php" target="_blank" class="link-item" data-link><i class="fas fa-database"></i><span class="link-name">Initialize Net Balance Table</span><span class="link-path">initialize-net-balance-table.php</span></a>
+                <a href="import-backup-non-destructive.php" target="_blank" class="link-item" data-link><i class="fas fa-file-import"></i><span class="link-name">Import Backup (Non-Destructive)</span><span class="link-path">import-backup-non-destructive.php</span></a>
+                <a href="sync-database.php" target="_blank" class="link-item" data-link><i class="fas fa-sync"></i><span class="link-name">Sync Database</span><span class="link-path">sync-database.php</span></a>
+                <div class="link-divider">Fix Scripts</div>
+                <a href="fix-member-net-balance-yearid.php" target="_blank" class="link-item" data-link><i class="fas fa-wrench"></i><span class="link-name">Fix Member Net Balance YearID</span><span class="link-path">fix-member-net-balance-yearid.php</span></a>
+                <a href="manage-transactions.php" target="_blank" class="link-item" data-link><i class="fas fa-exchange-alt"></i><span class="link-name">Manage Transactions (Root)</span><span class="link-path">manage-transactions.php</span></a>
+                <a href="verification-report.php" target="_blank" class="link-item" data-link><i class="fas fa-clipboard-check"></i><span class="link-name">Verification Report</span><span class="link-path">verification-report.php</span></a>
+                <a href="verify-page.php" target="_blank" class="link-item" data-link><i class="fas fa-check-circle"></i><span class="link-name">Verify Page</span><span class="link-path">verify-page.php</span></a>
+                <div class="link-divider">Password & Admin</div>
+                <a href="generate-password.php" target="_blank" class="link-item" data-link><i class="fas fa-key"></i><span class="link-name">Generate Password</span><span class="link-path">generate-password.php</span></a>
+                <a href="generate-demo-passwords.php" target="_blank" class="link-item" data-link><i class="fas fa-key"></i><span class="link-name">Generate Demo Passwords</span><span class="link-path">generate-demo-passwords.php</span></a>
+                <a href="reset-admin-password.php" target="_blank" class="link-item" data-link><i class="fas fa-undo"></i><span class="link-name">Reset Admin Password</span><span class="link-path">reset-admin-password.php</span></a>
+                <a href="unlock-super-admin.php" target="_blank" class="link-item" data-link><i class="fas fa-lock-open"></i><span class="link-name">Unlock Super Admin</span><span class="link-path">unlock-super-admin.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- INCLUDES (SHARED COMPONENTS) -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-includes" data-section data-cat="utility">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-puzzle-piece section-icon"></i>
+                <h2>Includes (Shared Components)</h2>
+                <span class="badge">18</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <div class="link-divider">Core Includes</div>
+                <a href="includes/session.php" target="_blank" class="link-item" data-link><i class="fas fa-cookie"></i><span class="link-name">Session Handler</span><span class="link-path">includes/session.php</span></a>
+                <a href="includes/functions.php" target="_blank" class="link-item" data-link><i class="fas fa-code"></i><span class="link-name">Functions</span><span class="link-path">includes/functions.php</span></a>
+                <a href="includes/global-settings.php" target="_blank" class="link-item" data-link><i class="fas fa-globe"></i><span class="link-name">Global Settings</span><span class="link-path">includes/global-settings.php</span></a>
+                <div class="link-divider">UI Components</div>
+                <a href="includes/chatbot-widget.php" target="_blank" class="link-item" data-link><i class="fas fa-robot"></i><span class="link-name">Chatbot Widget</span><span class="link-path">includes/chatbot-widget.php</span></a>
+                <a href="includes/chatbot.php" target="_blank" class="link-item" data-link><i class="fas fa-robot"></i><span class="link-name">Chatbot</span><span class="link-path">includes/chatbot.php</span></a>
+                <a href="includes/notification-widget.php" target="_blank" class="link-item" data-link><i class="fas fa-bell"></i><span class="link-name">Notification Widget</span><span class="link-path">includes/notification-widget.php</span></a>
+                <a href="includes/modal-component.php" target="_blank" class="link-item" data-link><i class="fas fa-window-maximize"></i><span class="link-name">Modal Component</span><span class="link-path">includes/modal-component.php</span></a>
+                <a href="includes/proof-upload-component.php" target="_blank" class="link-item" data-link><i class="fas fa-upload"></i><span class="link-name">Proof Upload Component</span><span class="link-path">includes/proof-upload-component.php</span></a>
+                <a href="includes/logo-helper.php" target="_blank" class="link-item" data-link><i class="fas fa-image"></i><span class="link-name">Logo Helper</span><span class="link-path">includes/logo-helper.php</span></a>
+                <a href="includes/link-target-helper.php" target="_blank" class="link-item" data-link><i class="fas fa-external-link-alt"></i><span class="link-name">Link Target Helper</span><span class="link-path">includes/link-target-helper.php</span></a>
+                <div class="link-divider">Helpers</div>
+                <a href="includes/net-balance-helper.php" target="_blank" class="link-item" data-link><i class="fas fa-balance-scale"></i><span class="link-name">Net Balance Helper</span><span class="link-path">includes/net-balance-helper.php</span></a>
+                <a href="includes/advanced-balance-management.php" target="_blank" class="link-item" data-link><i class="fas fa-calculator"></i><span class="link-name">Advanced Balance Management</span><span class="link-path">includes/advanced-balance-management.php</span></a>
+                <a href="includes/google-drive-helper.php" target="_blank" class="link-item" data-link><i class="fab fa-google-drive"></i><span class="link-name">Google Drive Helper</span><span class="link-path">includes/google-drive-helper.php</span></a>
+                <a href="includes/face-helper.php" target="_blank" class="link-item" data-link><i class="fas fa-camera"></i><span class="link-name">Face Helper</span><span class="link-path">includes/face-helper.php</span></a>
+                <a href="includes/totp-helper.php" target="_blank" class="link-item" data-link><i class="fas fa-shield-alt"></i><span class="link-name">TOTP Helper</span><span class="link-path">includes/totp-helper.php</span></a>
+                <div class="link-divider">Navigation Includes</div>
+                <a href="admin/includes/sidebar.php" target="_blank" class="link-item" data-link><i class="fas fa-bars"></i><span class="link-name">Admin Sidebar</span><span class="link-path">admin/includes/sidebar.php</span></a>
+                <a href="superadmin/includes/navbar.php" target="_blank" class="link-item" data-link><i class="fas fa-bars"></i><span class="link-name">Super Admin Navbar</span><span class="link-path">superadmin/includes/navbar.php</span></a>
+                <a href="superadmin/includes/quick-nav.php" target="_blank" class="link-item" data-link><i class="fas fa-th"></i><span class="link-name">Super Admin Quick Nav</span><span class="link-path">superadmin/includes/quick-nav.php</span></a>
+                <a href="superadmin/includes/datetime-widget.php" target="_blank" class="link-item" data-link><i class="fas fa-clock"></i><span class="link-name">DateTime Widget</span><span class="link-path">superadmin/includes/datetime-widget.php</span></a>
+                <a href="superadmin/session.php" target="_blank" class="link-item" data-link><i class="fas fa-cookie"></i><span class="link-name">Super Admin Session</span><span class="link-path">superadmin/session.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- CONFIG -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-config" data-section data-cat="utility">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-cogs section-icon"></i>
+                <h2>Configuration</h2>
+                <span class="badge">2</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="config/config.php" target="_blank" class="link-item" data-link><i class="fas fa-file-code"></i><span class="link-name">Config</span><span class="link-path">config/config.php</span></a>
+                <a href="config/config.local.example.php" target="_blank" class="link-item" data-link><i class="fas fa-file-code"></i><span class="link-name">Config Local Example</span><span class="link-path">config/config.local.example.php</span></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- STATIC / HTML DOCS -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="section-card section-docs" data-section data-cat="utility">
+            <div class="section-header" onclick="toggleSection(this)">
+                <i class="fas fa-book section-icon"></i>
+                <h2>Static Pages & Documentation</h2>
+                <span class="badge">5</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="link-list">
+                <a href="index.html" target="_blank" class="link-item" data-link><i class="fas fa-home"></i><span class="link-name">Home Page</span><span class="link-path">index.html</span></a>
+                <a href="superadmin/FAQ.htm" target="_blank" class="link-item" data-link><i class="fas fa-question-circle"></i><span class="link-name">FAQ</span><span class="link-path">superadmin/FAQ.htm</span></a>
+                <a href="superadmin/changelog.htm" target="_blank" class="link-item" data-link><i class="fas fa-history"></i><span class="link-name">Changelog</span><span class="link-path">superadmin/changelog.htm</span></a>
+                <a href="superadmin/theme-showcase.html" target="_blank" class="link-item" data-link><i class="fas fa-paint-brush"></i><span class="link-name">Theme Showcase</span><span class="link-path">superadmin/theme-showcase.html</span></a>
+                <a href="superadmin/custom-fields-setup.html" target="_blank" class="link-item" data-link><i class="fas fa-sliders-h"></i><span class="link-name">Custom Fields Setup</span><span class="link-path">superadmin/custom-fields-setup.html</span></a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 SR Colony Chitti Management System — Complete Pages Directory</p>
+</footer>
+
+<script>
+    // Count total links
+    const allLinks = document.querySelectorAll('[data-link]');
+    document.getElementById('totalCount').textContent = allLinks.length;
+    document.getElementById('visibleCount').textContent = allLinks.length;
+
+    // Toggle section collapse
+    function toggleSection(header) {
+        header.closest('.section-card').classList.toggle('collapsed');
+    }
+
+    function expandAll() {
+        document.querySelectorAll('.section-card').forEach(s => s.classList.remove('collapsed'));
+    }
+
+    function collapseAll() {
+        document.querySelectorAll('.section-card').forEach(s => s.classList.add('collapsed'));
+    }
+
+    // Category filter
+    let activeCategory = 'all';
+    function filterCategory(cat, btn) {
+        activeCategory = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterLinks();
+    }
+
+    // Search + category filter
+    function filterLinks() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const sections = document.querySelectorAll('[data-section]');
+        const noResults = document.getElementById('noResults');
+        let totalVisible = 0;
+
+        sections.forEach(section => {
+            const sectionCat = section.getAttribute('data-cat') || '';
+            const catMatch = activeCategory === 'all' || sectionCat === activeCategory;
+
+            if (!catMatch) {
+                section.classList.add('hidden');
+                return;
+            }
+
+            const links = section.querySelectorAll('[data-link]');
+            let visibleCount = 0;
+
+            links.forEach(link => {
+                const name = link.querySelector('.link-name').textContent.toLowerCase();
+                const path = link.querySelector('.link-path').textContent.toLowerCase();
+                const match = !query || name.includes(query) || path.includes(query);
+                link.classList.toggle('hidden', !match);
+                if (match) visibleCount++;
+            });
+
+            // Show/hide dividers
+            const dividers = section.querySelectorAll('.link-divider');
+            dividers.forEach(divider => {
+                let nextEl = divider.nextElementSibling;
+                let hasVisibleLink = false;
+                while (nextEl && !nextEl.classList.contains('link-divider')) {
+                    if (nextEl.hasAttribute('data-link') && !nextEl.classList.contains('hidden')) {
+                        hasVisibleLink = true;
+                        break;
+                    }
+                    nextEl = nextEl.nextElementSibling;
+                }
+                divider.classList.toggle('hidden', !hasVisibleLink);
+            });
+
+            section.classList.toggle('hidden', visibleCount === 0);
+            totalVisible += visibleCount;
+        });
+
+        document.getElementById('visibleCount').textContent = totalVisible;
+        noResults.classList.toggle('hidden', totalVisible > 0 || !query);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Theme Showcase - Super Admin Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../superadmin/shared-styles.css">
+    <style>
+        .showcase-section {
+            margin-bottom: 50px;
+        }
+        
+        .showcase-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .showcase-description {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .component-demo {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+        }
+        
+        .component-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .hero {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 60px 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card-demo {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card-demo:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card-demo:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .gradient-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .gradient-box {
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .gradient-box:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--text-primary);
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="#" class="navbar-brand">
+                <i class="fas fa-palette"></i>
+                <span>Theme Showcase</span>
+            </a>
+            <div class="navbar-user">
+                <button class="theme-toggle" onclick="window.ThemeManager.toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                    <span id="themeText">Dark</span>
+                </button>
+                <a href="../superadmin/dashboard.php" class="btn-logout">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1><i class="fas fa-sparkles"></i> Enhanced Theme Showcase</h1>
+            <p>Experience the modern, gradient-rich design system</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-chart-line"></i> Statistics Cards
+            </h2>
+            <p class="showcase-description">Hover over cards to see the gradient accent bar and lift animation</p>
+            <div class="stat-grid">
+                <div class="stat-card-demo">
+                    <div class="stat-number">1,234</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-number">₹45,678</div>
+                    <div class="stat-label">Revenue</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-number">98.5%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-number">567</div>
+                    <div class="stat-label">Active Sessions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gradient Presets -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-fill-drip"></i> Gradient Presets
+            </h2>
+            <p class="showcase-description">Five beautiful gradient presets available throughout the theme</p>
+            <div class="gradient-showcase">
+                <div class="gradient-box" style="background: var(--gradient-primary);">
+                    Primary
+                </div>
+                <div class="gradient-box" style="background: var(--gradient-success);">
+                    Success
+                </div>
+                <div class="gradient-box" style="background: var(--gradient-danger);">
+                    Danger
+                </div>
+                <div class="gradient-box" style="background: var(--gradient-warning);">
+                    Warning
+                </div>
+                <div class="gradient-box" style="background: var(--gradient-info);">
+                    Info
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-hand-pointer"></i> Buttons with Ripple Effects
+            </h2>
+            <p class="showcase-description">Hover over buttons to see the expanding ripple animation</p>
+            <div class="component-demo">
+                <div class="button-group">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-save"></i> Primary Button
+                    </button>
+                    <button class="btn btn-success">
+                        <i class="fas fa-check"></i> Success Button
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Danger Button
+                    </button>
+                    <button class="btn btn-warning">
+                        <i class="fas fa-exclamation"></i> Warning Button
+                    </button>
+                    <button class="btn btn-info">
+                        <i class="fas fa-info"></i> Info Button
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Secondary
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-tags"></i> Gradient Badges
+            </h2>
+            <p class="showcase-description">Badges with gradient backgrounds and hover scale effect</p>
+            <div class="component-demo">
+                <div class="badge-group">
+                    <span class="badge badge-success">Active</span>
+                    <span class="badge badge-danger">Inactive</span>
+                    <span class="badge badge-warning">Pending</span>
+                    <span class="badge badge-info">New</span>
+                    <span class="badge badge-success">Verified</span>
+                    <span class="badge badge-danger">Blocked</span>
+                    <span class="badge badge-warning">Processing</span>
+                    <span class="badge badge-info">Updated</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-bell"></i> Gradient Alerts
+            </h2>
+            <p class="showcase-description">Alerts with translucent gradient overlays</p>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div><strong>Success!</strong> Your operation completed successfully.</div>
+            </div>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <div><strong>Error!</strong> Something went wrong. Please try again.</div>
+            </div>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div><strong>Warning!</strong> Please review your input before proceeding.</div>
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div><strong>Info:</strong> This is an informational message.</div>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-window-restore"></i> Enhanced Cards
+            </h2>
+            <p class="showcase-description">Cards with gradient accent bar on hover and lift animation</p>
+            <div class="showcase-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>This card demonstrates the hover effect with a gradient accent bar appearing at the top and a smooth lift animation.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-users"></i> Team Members
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Hover over any card to see the beautiful gradient accent and shadow enhancement.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-cog"></i> Settings
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p>The cubic-bezier easing creates a natural, smooth animation feel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forms -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-edit"></i> Form Elements
+            </h2>
+            <p class="showcase-description">Inputs with gradient focus glow effects</p>
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Text Input</label>
+                        <input type="text" class="form-control" placeholder="Focus to see the gradient glow">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Dropdown</label>
+                        <select class="form-control">
+                            <option>Option 1</option>
+                            <option>Option 2</option>
+                            <option>Option 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Textarea</label>
+                        <textarea class="form-control" rows="4" placeholder="Try focusing on this field"></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> Submit
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Examples -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-code"></i> Code Examples
+            </h2>
+            <p class="showcase-description">How to use these components in your pages</p>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Button Example</h3>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+&lt;button class="btn btn-primary"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;i class="fas fa-save"&gt;&lt;/i&gt; Save Changes<br>
+&lt;/button&gt;
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Badge Example</h3>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+&lt;span class="badge badge-success"&gt;Active&lt;/span&gt;
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Alert Example</h3>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+&lt;div class="alert alert-success"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;i class="fas fa-check-circle"&gt;&lt;/i&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;div&gt;Success message here!&lt;/div&gt;<br>
+&lt;/div&gt;
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Using CSS Variables</h3>
+                </div>
+                <div class="card-body">
+                    <div class="code-block">
+/* Use gradient variables */<br>
+background: var(--gradient-primary);<br>
+<br>
+/* Use shadow variables */<br>
+box-shadow: var(--shadow-lg);<br>
+<br>
+/* Use color variables */<br>
+color: var(--text-primary);<br>
+background: var(--bg-secondary);
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Demo Button -->
+        <div class="showcase-section">
+            <h2 class="showcase-title">
+                <i class="fas fa-window-maximize"></i> Modal with Blur & Animation
+            </h2>
+            <p class="showcase-description">Click to see modal with backdrop blur and slide-down animation</p>
+            <button class="btn btn-primary" onclick="openDemoModal()">
+                <i class="fas fa-eye"></i> Open Modal Demo
+            </button>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="card" style="margin-top: 50px;">
+            <div class="card-body" style="text-align: center;">
+                <h3 style="margin-bottom: 15px;">
+                    <i class="fas fa-rocket"></i> Ready to Use!
+                </h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    All these components are production-ready and available in your Super Admin Portal.
+                </p>
+                <div class="button-group" style="justify-content: center;">
+                    <a href="../superadmin/dashboard.php" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                    <a href="../documentation/THEME_QUICK_REFERENCE.md" class="btn btn-info">
+                        <i class="fas fa-book"></i> View Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div class="modal" id="demoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-star"></i> Demo Modal
+                </h3>
+                <button class="modal-close" onclick="closeDemoModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This modal demonstrates:</p>
+                <ul>
+                    <li>Blurred backdrop (backdrop-filter)</li>
+                    <li>Smooth fade-in animation</li>
+                    <li>Slide-down content animation</li>
+                    <li>Rotating close button on hover</li>
+                    <li>Large shadow for depth</li>
+                </ul>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>Try clicking outside the modal or on the X button to close it!</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDemoModal()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../superadmin/theme-manager.js"></script>
+    <script>
+        function openDemoModal() {
+            document.getElementById('demoModal').classList.add('active');
+        }
+
+        function closeDemoModal() {
+            document.getElementById('demoModal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        document.getElementById('demoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDemoModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDemoModal();
+            }
+        });
+
+        // Log theme changes
+        document.addEventListener('themeChanged', function(e) {
+            console.log('Theme changed to:', e.detail.theme);
+        });
+    </script>
+</body>
+</html>
