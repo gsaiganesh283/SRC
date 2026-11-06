@@ -12,12 +12,12 @@
  *     git clean -fd                  (remove untracked leftovers; KEEPS git-ignored files
  *                                     such as config.php, uploads/, backups/)
  *
- * SECURITY: the shared secret is read from `.deploy-secret`, placed ONE LEVEL ABOVE this repo
- * folder (so it is never in git). Every request must carry a matching GitHub HMAC signature.
+ * SECURITY: the shared secret is read from `.deploy-secret` in your HOME directory (outside any
+ * web root, so it is never served or committed). Every request must carry a matching GitHub HMAC.
  *
  * ── One-time setup ─────────────────────────────────────────────────────────
- * 1. cPanel File Manager: create a file ONE folder above this repo (e.g. in public_html)
- *    named  .deploy-secret  containing a long random string (your webhook secret).
+ * 1. cPanel File Manager: go to your HOME folder (/home/<user>, the one ABOVE public_html) and
+ *    create a file named  .deploy-secret  containing a long random string (your webhook secret).
  * 2. GitHub repo → Settings → Webhooks → Add webhook:
  *       Payload URL : https://YOUR-SITE/deploy.php   (the URL that maps to this repo folder)
  *       Content type: application/json
@@ -30,14 +30,24 @@
 header('Content-Type: text/plain; charset=utf-8');
 header('Cache-Control: no-store');
 
-$repoDir   = __DIR__;
-$secretFile = $repoDir . '/../.deploy-secret';
-$logFile    = $repoDir . '/../deploy.log';
-$secret = is_file($secretFile) ? trim((string)file_get_contents($secretFile)) : '';
+$repoDir = __DIR__;
+// Look for the secret outside the web root: HOME first, then one/two folders above the repo.
+$home = getenv('HOME') ?: (isset($_SERVER['HOME']) ? $_SERVER['HOME'] : '');
+$candidates = array_filter([
+    $home ? rtrim($home, '/') . '/.deploy-secret' : null,
+    $repoDir . '/../../.deploy-secret',
+    $repoDir . '/../.deploy-secret',
+]);
+$secretFile = '';
+$secret = '';
+foreach ($candidates as $c) {
+    if (is_file($c)) { $secretFile = $c; $secret = trim((string)file_get_contents($c)); break; }
+}
+$logFile = ($secretFile !== '' ? dirname($secretFile) : $repoDir . '/..') . '/deploy.log';
 
 if ($secret === '') {
     http_response_code(500);
-    exit("Deploy secret is not configured. Create a .deploy-secret file one folder above the repo.\n");
+    exit("Deploy secret is not configured. Create a .deploy-secret file in your home folder.\n");
 }
 
 // Optional: read the deploy log in a browser with ?log=1&token=<secret>
