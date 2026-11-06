@@ -983,9 +983,6 @@ try {
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-filter"></i> Apply Filter
                 </button>
-                <a href="report-builder.php" class="btn btn-primary" style="background: linear-gradient(135deg, #3f3a9e, #312e81);" title="Design your own report on the letterhead">
-                    <i class="fas fa-file-signature"></i> Report Builder
-                </a>
             </form>
         </div>
         
