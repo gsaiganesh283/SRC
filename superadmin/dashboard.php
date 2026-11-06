@@ -1327,6 +1327,7 @@ $expense_ratio = $income_base > 0 ? ($total_expenses / $income_base) * 100 : 0;
                 <a href="manage-academic-years.php" class="action-btn ab-orange" <?php echo getLinkTarget('manage-academic-years', 'superadmin'); ?>><i class="fas fa-calendar-alt"></i> Academic Years</a>
                 <a href="net-balance-manager.php" class="action-btn ab-teal" <?php echo getLinkTarget('net-balance-manager', 'superadmin'); ?>><i class="fas fa-balance-scale"></i> Net Balance</a>
                 <a href="reports.php" class="action-btn ab-indigo" <?php echo getLinkTarget('reports', 'superadmin'); ?>><i class="fas fa-chart-line"></i> Reports</a>
+                <a href="report-builder.php" class="action-btn ab-violet" <?php echo getLinkTarget('report-builder', 'superadmin'); ?>><i class="fas fa-file-signature"></i> Report Builder</a>
                 <a href="change-amount.php" class="action-btn ab-purple"><i class="fas fa-coins"></i> Change Amount</a>
                 <a href="bills.php" class="action-btn ab-rose"><i class="fas fa-file-invoice-dollar"></i> Bill Generator</a>
                 <a href="accounting/dashboard.php" class="action-btn ab-violet" <?php echo getLinkTarget('accounting-dashboard', 'superadmin'); ?>><i class="fas fa-calculator"></i> Accounting Portal</a>
