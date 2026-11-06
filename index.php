@@ -14,7 +14,7 @@ $siteName = getSiteName('SR Colony');
     <title><?php echo htmlspecialchars($siteName); ?> - Advanced Chitti Management System</title>
     <?php echo $faviconHtml; ?>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <style>
+    <style> 
         * {
             margin: 0;
             padding: 0;
