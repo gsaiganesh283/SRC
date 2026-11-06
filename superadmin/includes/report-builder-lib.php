@@ -766,7 +766,11 @@ function rbCleanBuilder($b, $depth = 0) {
 /**
  * Fill defaults, clamp values and drop anything that isn't allowed
  */
-function rbNormalizeConfig($raw) {
+/**
+ * Normalize ONE table section (source + columns + filters + sort + group + maths).
+ * The document-global keys (title, subtitle, layout, letterhead_id) are handled by rbNormalizeConfig.
+ */
+function rbNormalizeSection($raw) {
     $sources = rbSources();
     $raw = is_array($raw) ? $raw : [];
     $source = isset($raw['source'], $sources[$raw['source']]) ? $raw['source'] : 'transactions';
@@ -893,8 +897,23 @@ function rbNormalizeConfig($raw) {
         $calculations[] = ['label' => $label ?: 'Result', 'formula' => $formula, 'format' => $fmt($c['format'] ?? '', 'amount'), 'builder' => rbCleanBuilder($c['builder'] ?? null)];
     }
 
-    $l = is_array($raw['layout'] ?? null) ? $raw['layout'] : [];
-    $layout = [
+    return [
+        'heading' => $str($raw['heading'] ?? '', 120),
+        'source' => $source,
+        'filters' => $filters,
+        'columns' => $columns,
+        'manual_rows' => $manualRows,
+        'sort' => $sort,
+        'group_by' => $groupBy,
+        'calculations' => $calculations,
+    ];
+}
+
+/** Document-global layout options (shared by every section of the report). */
+function rbNormalizeLayout($l) {
+    $l = is_array($l) ? $l : [];
+    $str = function ($v, $max = 200) { return mb_substr(trim(is_scalar($v) ? (string)$v : ''), 0, $max); };
+    return [
         'orientation' => ($l['orientation'] ?? '') === 'L' ? 'L' : 'P',
         'font_size' => max(6.5, min(11, (float)($l['font_size'] ?? 8.5))),
         'date_format' => in_array($l['date_format'] ?? '', ['d-m-Y', 'd M Y', 'Y-m-d', 'd/m/Y'], true) ? $l['date_format'] : 'd-m-Y',
@@ -910,20 +929,32 @@ function rbNormalizeConfig($raw) {
         'notes' => $str($l['notes'] ?? '', 1500),
         'footer_note' => $str($l['footer_note'] ?? 'Computer-generated report', 80) ?: 'Computer-generated report',
     ];
+}
 
-    return [
+/**
+ * Normalize a whole report: document-global keys plus a `sections` array (one or more table sections).
+ * Backward compatible: a config with no `sections` becomes a single section built from the legacy
+ * top-level keys, and section[0]'s keys are also mirrored at the top level so old readers still work.
+ */
+function rbNormalizeConfig($raw) {
+    $raw = is_array($raw) ? $raw : [];
+    $str = function ($v, $max = 200) { return mb_substr(trim(is_scalar($v) ? (string)$v : ''), 0, $max); };
+    $rawSections = (isset($raw['sections']) && is_array($raw['sections']) && $raw['sections']) ? $raw['sections'] : [$raw];
+    $sections = [];
+    foreach (array_slice($rawSections, 0, 12) as $rs) {
+        $sections[] = rbNormalizeSection(is_array($rs) ? $rs : []);
+    }
+    if (!$sections) {
+        $sections = [rbNormalizeSection([])];
+    }
+    // Back-compat: expose section[0]'s per-section keys at the top level too
+    return array_merge($sections[0], [
         'title' => $str($raw['title'] ?? '', 120) ?: 'Custom Report',
         'subtitle' => $str($raw['subtitle'] ?? '', 120),
-        'source' => $source,
-        'filters' => $filters,
-        'columns' => $columns,
-        'manual_rows' => $manualRows,
-        'sort' => $sort,
-        'group_by' => $groupBy,
-        'calculations' => $calculations,
-        'layout' => $layout,
+        'layout' => rbNormalizeLayout($raw['layout'] ?? []),
         'letterhead_id' => max(0, (int)($raw['letterhead_id'] ?? 0)), // 0 = the default letterhead
-    ];
+        'sections' => $sections,
+    ]);
 }
 
 /**
@@ -1570,6 +1601,33 @@ function rbBuildReport(PDO $pdo, array $cfg) {
         'period' => $period,
         'truncated' => $truncated,
         'issues' => rbFormulaIssues($cfg),
+    ];
+}
+
+/**
+ * Build every table section of a report. Returns one render model per section (same shape as
+ * rbBuildReport), all sharing the document-global layout. A legacy config with no `sections`
+ * yields exactly one section, so existing single-table reports are unchanged.
+ */
+function rbBuildReportSections(PDO $pdo, array $cfg) {
+    $layout = $cfg['layout'];
+    $sections = (isset($cfg['sections']) && is_array($cfg['sections']) && $cfg['sections'])
+        ? $cfg['sections']
+        : [rbNormalizeSection($cfg)];
+    $models = [];
+    foreach (array_values($sections) as $sec) {
+        // Each section is a full, buildable config that shares the global layout + letterhead
+        $sc = array_merge($sec, ['layout' => $layout, 'letterhead_id' => $cfg['letterhead_id'] ?? 0]);
+        $model = rbBuildReport($pdo, $sc); // resets RbFormulaContext::$env at its top
+        $model['heading'] = $sec['heading'] ?? '';
+        $model['filters_text'] = rbFilterSummary($pdo, $sc);
+        $models[] = $model;
+    }
+    return [
+        'title' => $cfg['title'] ?? 'Custom Report',
+        'subtitle' => $cfg['subtitle'] ?? '',
+        'sections' => $models,
+        'section_count' => count($models),
     ];
 }
 

@@ -388,6 +388,17 @@ $boot = [
             .rb-col-opts { grid-template-columns: 1fr 1fr; }
             .rb-stage { padding: 10px; height: 70vh; min-height: 360px; }
         }
+        .rb-sectionbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; border: 1px solid var(--border-color); border-radius: 10px 10px 0 0; border-bottom: none; background: var(--rb-field); }
+        .rb-sectionbar .lbl { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; margin-right: 2px; }
+        .rb-seg { border: 1px solid var(--border-color); background: var(--rb-surface); color: var(--text-primary); border-radius: 7px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+        .rb-seg.on { background: linear-gradient(135deg, #7c3aed, var(--rb-indigo)); color: #fff; border-color: transparent; }
+        .rb-seg-add { border-style: dashed; color: var(--rb-indigo); }
+        .rb-seg-x { margin-left: 2px; color: #b4232a; border: none; background: none; cursor: pointer; font-size: 12px; }
+        .rb-sec-menu { position: relative; display: inline-block; }
+        .rb-sec-menu .menu { display: none; position: absolute; z-index: 50; top: 100%; left: 0; min-width: 190px; background: var(--rb-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 4px; margin-top: 2px; }
+        .rb-sec-menu.open .menu { display: block; }
+        .rb-sec-menu .menu button { display: block; width: 100%; text-align: left; border: none; background: none; color: var(--text-primary); padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .rb-sec-menu .menu button:hover { background: var(--rb-indigo-soft); color: var(--rb-indigo); }
     </style>
 </head>
 <body>
@@ -421,6 +432,7 @@ $boot = [
         <div class="rb-layout">
             <!-- ── Settings panel ─────────────────────────────────────── -->
             <aside class="rb-panel">
+                <div class="rb-sectionbar" id="rbSections"></div>
                 <div class="rb-tabs" role="tablist">
                     <button type="button" class="rb-tab active" data-tab="data"><i class="fas fa-database"></i>1. Data</button>
                     <button type="button" class="rb-tab" data-tab="columns"><i class="fas fa-columns"></i>2. Columns</button>
@@ -744,7 +756,7 @@ $boot = [
         const TOTAL_LABELS = { none: 'No total', sum: 'Sum', avg: 'Average', count: 'Count', min: 'Minimum', max: 'Maximum', recalc: 'Recalculate' };
         const OPS = { eq: 'equals', ne: 'is not', gt: 'greater than', gte: 'at least', lt: 'less than', lte: 'at most', contains: 'contains', not_contains: 'does not contain', starts: 'starts with', ends: 'ends with', empty: 'is blank', not_empty: 'is not blank', in: 'is one of (a, b, c)', between: 'between' };
 
-        const state = { meta: null, config: null, templateId: 0, name: '', description: '', dirty: false };
+        const state = { meta: null, config: null, templateId: 0, name: '', description: '', dirty: false, active: 0 };
         let previewTimer = null;
         let previewSeq = 0;
         let sortable = null;
@@ -828,9 +840,111 @@ $boot = [
             return c;
         }
 
+        // ── Sections (multiple tables in one report) ─────────────────────
+        const SECTION_KEYS = ['heading', 'source', 'filters', 'columns', 'manual_rows', 'sort', 'group_by', 'calculations'];
+        const cloneSafe = v => (v === undefined ? undefined : clone(v));
+        function extractSection(cfg) {
+            const s = {}; SECTION_KEYS.forEach(k => { s[k] = cloneSafe(cfg[k]); }); return s;
+        }
+        function currentGlobals() {
+            return { title: state.config.title, subtitle: state.config.subtitle, layout: clone(state.config.layout), letterhead_id: state.config.letterhead_id };
+        }
+        function stashSection() { state.config.sections[state.active] = extractSection(state.config); }
+        function loadSection(i) {
+            const g = currentGlobals();
+            const secs = state.config.sections;
+            state.config = withDefaults(Object.assign({}, g, clone(secs[i])));
+            state.config.sections = secs;
+            state.active = i;
+        }
+        function fullConfig() { stashSection(); return state.config; }
+        function sectionLabel(sec, i) {
+            const h = (sec.heading || '').trim();
+            if (h) return h;
+            return (state.meta.sources[sec.source]?.label) || ('Table ' + (i + 1));
+        }
+        function switchSection(i) {
+            if (i === state.active) return;
+            stashSection(); loadSection(i); renderAll(); schedulePreview(0);
+        }
+        function sectionFromConfig(cfg) {
+            const c = (cfg && Array.isArray(cfg.sections) && cfg.sections.length) ? cfg.sections[0] : (cfg || {});
+            const s = {}; SECTION_KEYS.forEach(k => { s[k] = cloneSafe(c[k]); }); return s;
+        }
+        function addSection(sec) {
+            stashSection();
+            state.config.sections.push(sec);
+            loadSection(state.config.sections.length - 1);
+            renderAll(); changed({ rerender: false });
+        }
+        function removeSection() {
+            if (state.config.sections.length <= 1) return;
+            if (!confirm('Remove this table from the report?')) return;
+            const secs = state.config.sections;
+            secs.splice(state.active, 1);
+            state.active = Math.max(0, state.active - 1);
+            state.config.sections = secs;
+            loadSection(state.active); renderAll(); changed({ rerender: false });
+        }
+        function renameSection() {
+            const cur = (state.config.sections[state.active].heading) || state.config.heading || '';
+            const v = prompt('Heading for this table (blank = use the data-source name):', cur);
+            if (v === null) return;
+            state.config.heading = v.trim();
+            renderSectionBar(); changed();
+        }
+        function renderSectionBar() {
+            const bar = $('rbSections');
+            if (!bar || !state.config) return;
+            const secs = state.config.sections || [];
+            const presetItems = (state.meta.presets || []).map(p => `<button type="button" data-preset="${esc(p.key)}">${esc(p.name)}</button>`).join('');
+            bar.innerHTML = `<span class="lbl">Tables</span>`
+                + secs.map((s, i) => `<button type="button" class="rb-seg${i === state.active ? ' on' : ''}" data-sec="${i}">${i + 1}. ${esc(sectionLabel(s, i).slice(0, 24))}</button>`).join('')
+                + `<span class="rb-sec-menu" id="rbAddSecMenu"><button type="button" class="rb-seg rb-seg-add" id="rbAddSecBtn"><i class="fas fa-plus"></i> Add table</button>
+                     <div class="menu">
+                        <button type="button" data-add="blank"><i class="fas fa-table"></i> Blank table (customize)</button>
+                        ${presetItems ? `<div style="font-size:11px;color:var(--text-secondary);padding:4px 10px 2px">From a preset</div>${presetItems}` : ''}
+                        <button type="button" data-add="saved"><i class="fas fa-folder-open"></i> From a saved report…</button>
+                     </div></span>`
+                + (secs.length > 1 ? `<button type="button" class="rb-seg" id="rbRenameSec">Rename</button><button type="button" class="rb-seg-x" id="rbRemoveSec" title="Remove this table"><i class="fas fa-trash"></i></button>` : '');
+            bar.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => switchSection(+b.dataset.sec));
+            const menu = $('rbAddSecMenu');
+            $('rbAddSecBtn').onclick = e => { e.stopPropagation(); menu.classList.toggle('open'); };
+            document.addEventListener('click', () => menu && menu.classList.remove('open'), { once: true });
+            bar.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+                menu.classList.remove('open');
+                if (b.dataset.add === 'blank') addSection(extractSection(withDefaults(blankConfig('transactions'))));
+                else if (b.dataset.add === 'saved') addSectionFromSaved();
+            });
+            bar.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
+                menu.classList.remove('open');
+                const p = (state.meta.presets || []).find(x => x.key === b.dataset.preset);
+                if (p) addSection(sectionFromConfig(withDefaults(p.config)));
+            });
+            if ($('rbRenameSec')) $('rbRenameSec').onclick = renameSection;
+            if ($('rbRemoveSec')) $('rbRemoveSec').onclick = removeSection;
+        }
+        async function addSectionFromSaved() {
+            try {
+                const d = await api('templates');
+                const rows = d.templates || [];
+                if (!rows.length) { toast('No saved reports yet.', 'info'); return; }
+                const names = rows.map((r, i) => (i + 1) + '. ' + r.Name).join('\n');
+                const pick = prompt('Add which saved report as a table?\n\n' + names + '\n\nEnter the number:', '1');
+                const idx = parseInt(pick, 10) - 1;
+                if (isNaN(idx) || !rows[idx]) return;
+                const t = await api('template', undefined, '&id=' + rows[idx].TemplateID);
+                addSection(sectionFromConfig(t.template.Config));
+            } catch (e) { toast(e.message, 'error'); }
+        }
+
         // ── State changes ────────────────────────────────────────────────
         function load(cfg, { templateId = 0, name = '', description = '' } = {}) {
-            state.config = withDefaults(cfg);
+            const raw = clone(cfg || {});
+            let secs = (Array.isArray(raw.sections) && raw.sections.length) ? raw.sections : [extractSection(raw)];
+            state.active = 0;
+            state.config = withDefaults(Object.assign({}, raw, secs[0]));
+            state.config.sections = secs.map(s => clone(s));
             state.templateId = templateId;
             state.name = name;
             state.description = description;
@@ -841,6 +955,7 @@ $boot = [
 
         function changed({ rerender = false, preview = true } = {}) {
             setDirty(true);
+            if (state.config && state.config.sections) stashSection();
             store.set(DRAFT_KEY, { config: state.config, templateId: state.templateId, name: state.name, at: Date.now() });
             if (rerender) renderAll();
             if (preview) schedulePreview();
@@ -856,6 +971,7 @@ $boot = [
         // ── Rendering: Data tab ──────────────────────────────────────────
         function renderAll() {
             $('rbTitle').value = state.config.title;
+            renderSectionBar();
             renderSources();
             renderFilters();
             renderColumns();
@@ -1294,22 +1410,24 @@ $boot = [
             $('rbSpin').classList.add('show');
             $('rbStatus').textContent = 'Updating…';
             try {
-                const data = await api('preview', { config: state.config });
+                const data = await api('preview', { config: fullConfig() });
                 if (seq !== previewSeq) return;
                 $('rbError').classList.remove('show');
                 renderPaper(data);
-                applyIssues(data.issues);
+                const sections = data.sections || [data];
+                const active = sections[state.active] || sections[0];
+                applyIssues(active.issues || data.issues);
                 lastCalcValues = [];
-                data.calculations.forEach(c => { lastCalcValues[c.index] = c.value; });
+                (active.calculations || []).forEach(c => { lastCalcValues[c.index] = c.value; });
                 document.querySelectorAll('[data-calcval]').forEach(el => {
                     const v = lastCalcValues[+el.dataset.calcval];
                     el.innerHTML = v !== undefined ? '= <b>' + esc(v) + '</b>' : '';
                 });
-                const n = data.row_count;
-                const problems = Object.keys(data.issues.columns).length + Object.keys(data.issues.calculations).length;
+                const n = sections.reduce((a, s) => a + (s.row_count || 0), 0);
+                const problems = Object.keys(active.issues?.columns || {}).length + Object.keys(active.issues?.calculations || {}).length;
                 $('rbStatus').textContent = n.toLocaleString('en-IN') + ' record' + (n === 1 ? '' : 's')
-                    + (data.group_count ? ' in ' + data.group_count + ' group' + (data.group_count === 1 ? '' : 's') : '')
-                    + (data.preview_limited ? ' · preview shows the first 250' : '') + (data.truncated ? ' · capped at 20,000' : '')
+                    + (sections.length > 1 ? ' · ' + sections.length + ' tables' : '')
+                    + (sections.some(s => s.preview_limited) ? ' · preview shows the first 250' : '') + (sections.some(s => s.truncated) ? ' · capped at 20,000' : '')
                     + (problems ? ' · ' + problems + ' formula problem' + (problems === 1 ? '' : 's') : '');
             } catch (e) {
                 if (seq !== previewSeq) return;
@@ -1360,6 +1478,34 @@ $boot = [
                 <div class="doc-title${lh.title_style === 'plain' ? ' plain' : ''}">${esc(title)}</div>`;
         }
 
+        function sectionTableHtml(sec, l, multi, idx) {
+            const cols = sec.columns || [];
+            const weights = cols.reduce((a, c) => a + c.width, 0) || 1;
+            const fontPx = (l.font_size * 1.333).toFixed(1);
+            let zebra = false;
+            const body = (sec.items || []).map(it => {
+                if (it.type === 'group') { zebra = false; return `<tr class="grp"><td colspan="${cols.length}">${esc(it.label)}</td></tr>`; }
+                let cls = it.type === 'subtotal' ? 'sub' : 'tot';
+                if (it.type === 'row') { cls = l.zebra && zebra ? 'zebra' : ''; zebra = !zebra; }
+                return `<tr class="${cls}">${it.cells.map((c, i) => `<td class="a-${cols[i].align}">${esc(c)}</td>`).join('')}</tr>`;
+            }).join('');
+            const heading = (sec.heading || '').trim() || (multi ? 'Table ' + (idx + 1) : '');
+            return `
+                ${heading ? `<div class="doc-title plain" style="margin-top:${idx ? 14 : 8}px;text-align:left;font-size:15px">${esc(heading)}</div>` : ''}
+                ${multi && sec.filters_text ? `<div style="font-size:11px;color:#64748b;margin:0 0 4px">${esc(sec.filters_text)}</div>` : ''}
+                <div class="doc-table-wrap">
+                    ${cols.length ? `<table style="font-size:${fontPx}px">
+                        <colgroup>${cols.map(c => `<col style="width:${(c.width / weights * 100).toFixed(2)}%">`).join('')}</colgroup>
+                        <thead><tr>${cols.map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead>
+                        <tbody>${body}</tbody>
+                    </table>` : ''}
+                    ${sec.row_count ? '' : '<div class="doc-empty">No records match the selected filters.</div>'}
+                </div>
+                ${sec.preview_limited ? `<div class="doc-more">… ${(sec.row_count - 250).toLocaleString('en-IN')} more rows are included in the PDF / Excel.</div>` : ''}
+                ${(sec.tiles || []).length ? `<div class="tiles">${sec.tiles.map(t => `<div class="tile"><small>${esc(t[0])}</small><b title="${esc(t[1])}">${esc(t[1])}</b></div>`).join('')}</div>` : ''}
+                ${(sec.calculations || []).length ? `<div class="calcs"><div class="calcs-head">CALCULATIONS</div>${sec.calculations.map(c => `<div class="calc-row"><span>${esc(c.label)}</span><b>${esc(c.value)}</b></div>`).join('')}</div>` : ''}`;
+        }
+
         function renderPaper(data) {
             const cfg = data.config;
             const l = cfg.layout;
@@ -1371,41 +1517,23 @@ $boot = [
             paper.style.setProperty('--rb-gold', lh.accent);
             paper.style.setProperty('--rb-indigo-soft', tint(lh.primary, 0.9));
             paper.classList.toggle('landscape', l.orientation === 'L');
-            // Real paper width, widened when there are many columns so they scroll sideways instead of squeezing
+            const sections = data.sections || [data];
+            const multi = sections.length > 1;
+            const first = sections[0] || {};
+            const maxCols = sections.reduce((a, s) => Math.max(a, (s.columns || []).length), 1);
+            const totalRows = sections.reduce((a, s) => a + (s.row_count || 0), 0);
             const basePx = l.orientation === 'L' ? 1160 : 820;
             const minColPx = Math.round(l.font_size * 9);
-            paper.style.width = Math.max(basePx, data.columns.length * minColPx + 56) + 'px';
-            const weights = data.columns.reduce((a, c) => a + c.width, 0) || 1;
-            const fontPx = (l.font_size * 1.333).toFixed(1);
+            paper.style.width = Math.max(basePx, maxCols * minColPx + 56) + 'px';
             const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            let zebra = false;
-            const body = data.items.map(it => {
-                if (it.type === 'group') { zebra = false; return `<tr class="grp"><td colspan="${data.columns.length}">${esc(it.label)}</td></tr>`; }
-                let cls = it.type === 'subtotal' ? 'sub' : 'tot';
-                if (it.type === 'row') {
-                    cls = l.zebra && zebra ? 'zebra' : '';
-                    zebra = !zebra;
-                }
-                return `<tr class="${cls}">${it.cells.map((c, i) => `<td class="a-${data.columns[i].align}">${esc(c)}</td>`).join('')}</tr>`;
-            }).join('');
             paper.innerHTML = `
                 ${letterheadTopHtml(lh, lhEntry.logo_url, cfg.title)}
                 <div class="doc-details">
-                    <b>Report Period:</b><span>${esc(data.period || 'All dates')}</span><b>Ref. No:</b><span class="r">SRC/RPT/…</span>
+                    <b>Report Period:</b><span>${esc(first.period || 'All dates')}</span><b>Ref. No:</b><span class="r">SRC/RPT/…</span>
                     <b>Report Type:</b><span>${esc(cfg.subtitle || state.meta.sources[cfg.source].label)}</span><b>Date of Issue:</b><span class="r">${esc(today)}</span>
-                    <b>Filters:</b><span>${esc(data.filters_text)}</span><b>Records:</b><span class="r">${data.row_count.toLocaleString('en-IN')}</span>
+                    <b>${multi ? 'Tables:' : 'Filters:'}</b><span>${multi ? (sections.length + ' sections') : esc(first.filters_text || '')}</span><b>Records:</b><span class="r">${totalRows.toLocaleString('en-IN')}</span>
                 </div>
-                <div class="doc-table-wrap">
-                    ${data.columns.length ? `<table style="font-size:${fontPx}px">
-                        <colgroup>${data.columns.map(c => `<col style="width:${(c.width / weights * 100).toFixed(2)}%">`).join('')}</colgroup>
-                        <thead><tr>${data.columns.map(c => `<th>${esc(c.label)}</th>`).join('')}</tr></thead>
-                        <tbody>${body}</tbody>
-                    </table>` : ''}
-                    ${data.row_count ? '' : '<div class="doc-empty">No records match the selected filters.</div>'}
-                </div>
-                ${data.preview_limited ? `<div class="doc-more">… ${(data.row_count - 250).toLocaleString('en-IN')} more rows are included in the PDF / Excel.</div>` : ''}
-                ${data.tiles.length ? `<div class="tiles">${data.tiles.map(t => `<div class="tile"><small>${esc(t[0])}</small><b title="${esc(t[1])}">${esc(t[1])}</b></div>`).join('')}</div>` : ''}
-                ${data.calculations.length ? `<div class="calcs"><div class="calcs-head">CALCULATIONS</div>${data.calculations.map(c => `<div class="calc-row"><span>${esc(c.label)}</span><b>${esc(c.value)}</b></div>`).join('')}</div>` : ''}
+                ${sections.map((s, i) => sectionTableHtml(s, l, multi, i)).join('')}
                 ${l.notes ? `<div class="notes"><b>Notes</b>${esc(l.notes)}</div>` : ''}
                 ${l.signatures ? `<div class="sigs"><div class="sig"><b>${esc(l.sig_left)}</b><small>${esc(BOOT.user)}</small></div><div class="sig"><b>${esc(l.sig_right)}</b><small>For ${esc(o.name)}</small></div></div>` : ''}
                 <div class="doc-foot"><span>${esc(l.footer_note)} | Ref: SRC/RPT/…</span><span>Page 1 of …</span></div>
@@ -1990,9 +2118,11 @@ $boot = [
             wizPreviewTimer = setTimeout(async () => {
                 try {
                     const cfg = clone(state.config);
+                    delete cfg.sections; // evaluate just the active section with this one formula
                     cfg.calculations = [{ label: 'Result', formula, format: wiz.agg === 'count' ? 'integer' : (wiz.agg === 'pct' ? 'percent' : 'amount') }];
                     const data = await api('preview', { config: cfg });
-                    const msg = data.issues.calculations[0];
+                    const sec0 = (data.sections && data.sections[0]) || data;
+                    const msg = (sec0.issues || data.issues).calculations[0];
                     const scope = wiz.module
                         ? 'from the ' + (moduleEntry(wiz.module)[1]?.label || wiz.module) + ' module' + (wiz.sameRange ? ', inside the report\'s dates' : ', all of its rows')
                         : 'over the ' + data.row_count.toLocaleString('en-IN') + ' rows currently in the report, after the filters in step 1';
@@ -2411,7 +2541,7 @@ $boot = [
         async function doSave(name, description) {
             if (!name.trim()) { toast('Give the report a name.', 'error'); return; }
             try {
-                const res = await api('save', { id: saveAsNew ? 0 : state.templateId, name, description, config: state.config });
+                const res = await api('save', { id: saveAsNew ? 0 : state.templateId, name, description, config: fullConfig() });
                 state.templateId = res.id;
                 state.name = res.name;
                 state.description = description;
@@ -2433,7 +2563,7 @@ $boot = [
         document.querySelectorAll('[data-export]').forEach(b => b.addEventListener('click', () => {
             if (!state.config.columns.filter(c => !c.hidden).length) { toast('Add at least one visible column first.', 'error'); return; }
             const form = $('rbExportForm');
-            form.config.value = JSON.stringify(state.config);
+            form.config.value = JSON.stringify(fullConfig());
             form.format.value = b.dataset.export;
             form.submit();
             toast(b.dataset.export === 'pdf' ? 'Opening the PDF in a new tab…' : 'Your ' + (b.dataset.export === 'xlsx' ? 'Excel' : 'CSV') + ' file is downloading…', 'success');

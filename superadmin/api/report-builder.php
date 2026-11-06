@@ -113,34 +113,42 @@ try {
 
         case 'preview':
             $cfg = rbNormalizeConfig($body['config'] ?? []);
-            $report = rbBuildReport($pdo, $cfg);
-            // Keep the preview light: first 250 data rows, plus the grand total
-            $items = [];
-            $rows = 0;
-            $limited = false;
-            foreach ($report['items'] as $item) {
-                if ($item['type'] === 'total') continue;
-                if ($item['type'] === 'row' && ++$rows > 250) { $limited = true; break; }
-                unset($item['raw']);
-                $items[] = $item;
-            }
-            foreach ($report['items'] as $item) {
-                if ($item['type'] === 'total') { unset($item['raw']); $items[] = $item; }
-            }
-            rbJson([
+            $full = rbBuildReportSections($pdo, $cfg);
+            // Keep each section light: first 250 data rows, plus the grand total
+            $lighten = function ($report) {
+                $items = [];
+                $rows = 0;
+                $limited = false;
+                foreach ($report['items'] as $item) {
+                    if ($item['type'] === 'total') continue;
+                    if ($item['type'] === 'row' && ++$rows > 250) { $limited = true; break; }
+                    unset($item['raw']);
+                    $items[] = $item;
+                }
+                foreach ($report['items'] as $item) {
+                    if ($item['type'] === 'total') { unset($item['raw']); $items[] = $item; }
+                }
+                return [
+                    'heading' => $report['heading'] ?? '',
+                    'columns' => $report['columns'],
+                    'items' => $items,
+                    'row_count' => $report['row_count'],
+                    'group_count' => $report['group_count'],
+                    'tiles' => $report['tiles'],
+                    'calculations' => array_map(function ($c) { return ['label' => $c['label'], 'value' => $c['value'], 'index' => $c['index']]; }, $report['calculations']),
+                    'issues' => $report['issues'],
+                    'period' => $report['period'],
+                    'filters_text' => $report['filters_text'] ?? '',
+                    'truncated' => $report['truncated'],
+                    'preview_limited' => $limited,
+                ];
+            };
+            $sections = array_map($lighten, $full['sections']);
+            // section[0] is also mirrored at the top level so older clients keep working
+            rbJson(array_merge($sections[0] ?? [], [
                 'config' => $cfg,
-                'columns' => $report['columns'],
-                'items' => $items,
-                'row_count' => $report['row_count'],
-                'group_count' => $report['group_count'],
-                'tiles' => $report['tiles'],
-                'calculations' => array_map(function ($c) { return ['label' => $c['label'], 'value' => $c['value'], 'index' => $c['index']]; }, $report['calculations']),
-                'issues' => $report['issues'],
-                'period' => $report['period'],
-                'filters_text' => rbFilterSummary($pdo, $cfg),
-                'preview_limited' => $limited,
-                'truncated' => $report['truncated'],
-            ]);
+                'sections' => $sections,
+            ]));
 
         case 'values':
             // Distinct values of one field, to suggest in the condition builder
