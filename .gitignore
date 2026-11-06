@@ -49,6 +49,10 @@ uploads/*
 # Temporary one-off server helper (never commit; runs shell commands)
 git-fix.php
 
+# Auto-deploy webhook secret and log (must never be committed)
+.deploy-secret
+deploy.log
+
 # Build and dist files
 dist/
 build/
